@@ -1,20 +1,25 @@
-import './index.css';
 import { useState } from 'react';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { getFetch } from '@trpc/client';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
-import { trpc } from './utils/trpc';
+import { trpc } from '../utils/trpc';
+import { Layout } from '../components/Layout';
+import styled from 'styled-components';
 
 function AppContent() {
   const itemsCount = trpc.countItems.useQuery();
   return (
-    <main className="p-2">{JSON.stringify(itemsCount.data, null, 2)}</main>
+    <Layout>
+      <div>
+        <main className="p-2">{JSON.stringify(itemsCount.data, null, 2)}</main>
+      </div>
+    </Layout>
   );
 }
 
-function App() {
+export function HomePage() {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -52,5 +57,3 @@ function App() {
     </trpc.Provider>
   );
 }
-
-export default App;
