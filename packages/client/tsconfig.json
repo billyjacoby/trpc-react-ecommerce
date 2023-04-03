@@ -18,7 +18,7 @@
     "plugins": [
       {
         "name": "@styled/typescript-styled-plugin",
-        "tags": ["styled", "css", "sty"]
+        "tags": ["styled"]
       }
     ],
     "paths": {
