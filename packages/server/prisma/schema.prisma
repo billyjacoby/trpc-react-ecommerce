@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(uuid())
+  name     String   @db.VarChar(255)
+  email    String   @unique
+  photo    String?  @default("default.png")
+  verified Boolean? @default(false)
+
+  password String
+  role     RoleEnumType? @default(user)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  provider String?
+
+  @@map(name: "users")
+}
+
+//* Items are not intended to be for sale but instead to be combined 
+//* in order to create items that are for sale. They can also be sold
+//* individually, but should have a product that points to them if so
+model Item {
+  id String @id @default(uuid())
+
+  name                String   @db.VarChar(255)
+  photos              String[] @default([])
+  default_photo_index Int      @default(0)
+
+  cost            Int  @default(0) @db.Integer()
+  number_in_stock Int? @default(0) @db.Integer()
+
+  products Product[]
+
+  @@map(name: "items")
+}
+
+model Product {
+  id String @id @default(uuid())
+
+  name                String   @db.VarChar(255)
+  description         String   @default("Description here") @db.Text
+  photos              String[] @default([])
+  default_photo_index Int      @default(0)
+
+  items Item[]
+
+  //? These items should really just be mapped to the corresponding item info
+  // price_to_consumer Int @default(0)
+  // number_in_stock   Int? @default(0) @db.Integer()
+
+  @@map(name: "products")
+}
+
+enum RoleEnumType {
+  user
+  admin
+}

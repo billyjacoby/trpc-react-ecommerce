@@ -1,0 +1,16 @@
+{
+  "name": "trpc-node-react",
+  "scripts": {
+    "start": "concurrently \"wsrun --parallel start\"",
+    "docker": "docker-compose up -d",
+    "docker:kill": "docker-compose down"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.0.1",
+    "wsrun": "^5.2.4"
+  },
+  "packageManager": "yarn@3.5.0"
+}
