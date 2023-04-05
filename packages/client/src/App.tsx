@@ -4,22 +4,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { getFetch } from '@trpc/client';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
-import { trpc } from '../utils/trpc';
-import { Layout } from '../components/Layout';
-import styled from 'styled-components';
+import { trpc } from './utils/trpc';
 
-function AppContent() {
-  const itemsCount = trpc.countItems.useQuery();
-  return (
-    <Layout>
-      <div>
-        <main className="p-2">{JSON.stringify(itemsCount.data, null, 2)}</main>
-      </div>
-    </Layout>
-  );
-}
-
-export function HomePage() {
+export function App({ children }: React.PropsWithChildren) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -51,8 +38,8 @@ export function HomePage() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <AppContent />
         <ReactQueryDevtools initialIsOpen={false} />
+        {children}
       </QueryClientProvider>
     </trpc.Provider>
   );

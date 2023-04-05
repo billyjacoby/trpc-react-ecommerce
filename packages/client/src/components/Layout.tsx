@@ -21,6 +21,6 @@ export const Layout = (props: ContainerProps) => {
 
 const StyledContainer = styled.div`
   display: flex;
+  align-items: flex-start;
   flex-direction: column;
-  flex: 1;
 `;
