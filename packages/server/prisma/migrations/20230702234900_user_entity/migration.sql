@@ -1,7 +1,27 @@
+-- CreateEnum
+CREATE TYPE "RoleEnumType" AS ENUM ('user', 'admin');
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "email" TEXT NOT NULL,
+    "photo" TEXT,
+    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "password" TEXT NOT NULL,
+    "role" "RoleEnumType" NOT NULL DEFAULT 'user',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "provider" TEXT,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateTable
 CREATE TABLE "items" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
+    "description" TEXT,
     "photos" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "default_photo_index" INTEGER NOT NULL DEFAULT 0,
     "cost" INTEGER NOT NULL DEFAULT 0,
@@ -15,6 +35,9 @@ CREATE TABLE "products" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "description" TEXT NOT NULL DEFAULT 'Description here',
+    "cost_extended" DOUBLE PRECISION,
+    "price_to_consumer" DOUBLE PRECISION,
+    "margin" DOUBLE PRECISION NOT NULL DEFAULT 0.35,
     "photos" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "default_photo_index" INTEGER NOT NULL DEFAULT 0,
 
@@ -26,6 +49,9 @@ CREATE TABLE "_ItemToProduct" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ItemToProduct_AB_unique" ON "_ItemToProduct"("A", "B");
