@@ -5,13 +5,11 @@ import morgan from 'morgan';
 import cors from 'cors';
 import * as trpcExpress from '@trpc/server/adapters/express';
 import customConfig from './config/default';
-import connectDB from './utils/prisma';
-import { appRouter } from './utils/trpc';
-import { createContext } from 'vm';
+import connectDB from './lib/prisma';
+import { appRouter, AppRouter } from './routers/trpc/router';
+import { createContext } from './lib/trpc/context';
 
 dotenv.config({ path: path.join(__dirname, './.env') });
-
-export type AppRouter = typeof appRouter;
 
 const app = express();
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
@@ -37,3 +35,6 @@ app.listen(port, () => {
   // CONNECT DB
   connectDB();
 });
+
+// Type exports
+export { AppRouter };

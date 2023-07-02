@@ -1,31 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-import { inferAsyncReturnType, initTRPC } from '@trpc/server';
-import { createContext } from 'vm';
-import { z } from 'zod';
+import z from 'zod';
+import { prismaProcedure, t } from '../../lib/trpc/init';
 
-export type Context = inferAsyncReturnType<typeof createContext>;
-
-const t = initTRPC.context<Context>().create();
-const prisma = new PrismaClient();
-
-export const appRouter = t.router({
-  sayHello: t.procedure.query(async () => {
-    const message = 'this is the hello';
-    return { message };
-  }),
-  sayGoodbye: t.procedure.query(async () => {
-    const message = 'This is the end for you my friend';
-    return { message };
-  }),
-  countItems: t.procedure.query(async () => {
+export const itemsRouter = t.router({
+  countItems: prismaProcedure.query(async ({ ctx: { prisma } }) => {
     const itemsCount = await prisma.item.count();
     return { message: `number of items: ${itemsCount}` };
   }),
-  listItems: t.procedure.query(async () => {
+  listItems: prismaProcedure.query(async ({ ctx: { prisma } }) => {
     const items = await prisma.item.findMany();
     return { message: items };
   }),
-  addItem: t.procedure
+  addItem: prismaProcedure
     .input(
       z.object({
         name: z.string().nonempty(),
@@ -33,7 +18,7 @@ export const appRouter = t.router({
         onHand: z.number().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { prisma } }) => {
       const result = await prisma.item.create({
         data: {
           name: input.name,
@@ -43,18 +28,18 @@ export const appRouter = t.router({
       });
       return { message: result };
     }),
-  removeItem: t.procedure
+  removeItem: prismaProcedure
     .input(
       z.object({
         id: z.string().nonempty(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { prisma } }) => {
       const result = await prisma.item.delete({ where: { id: input.id } });
 
       return { message: result };
     }),
-  updateItem: t.procedure
+  updateItem: prismaProcedure
     .input(
       z.object({
         id: z.string().nonempty(),
@@ -62,7 +47,7 @@ export const appRouter = t.router({
         number_in_stock: z.number().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { prisma } }) => {
       const result = await prisma.item.update({
         where: {
           id: input.id,
