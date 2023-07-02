@@ -2,21 +2,22 @@ import React from 'react';
 
 import { Layout } from '@components/Layout';
 import { trpc } from '../../utils/trpc';
-import { Button, Label, TextInput } from 'flowbite-react';
 import { Item } from './components/Item';
 import type { Item as ItemType } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import styled from 'styled-components';
+import { Input } from '@components/ui/input';
+import { Button } from '@components/ui/button';
 
 export const AdminPage = () => {
   const [name, setName] = React.useState('');
   const [number_in_stock, setnumberInStock] = React.useState<string>('0');
   const [cost, setCost] = React.useState<string>('0');
 
-  const { data: items, refetch } = trpc.listItems.useQuery();
-  const addItemMutation = trpc.addItem.useMutation();
-  const deleteItemMutation = trpc.removeItem.useMutation();
-  const updateItem = trpc.updateItem.useMutation();
+  const { data: items, refetch } = trpc.items.listItems.useQuery();
+  const addItemMutation = trpc.items.addItem.useMutation();
+  const deleteItemMutation = trpc.items.removeItem.useMutation();
+  const updateItem = trpc.items.updateItem.useMutation();
 
   const insertItem = (vars: {
     name: string;
@@ -94,8 +95,8 @@ export const AdminPage = () => {
         >
           <div className="flex gap-4 flex-1">
             <div className="text-center">
-              <Label>name:</Label>
-              <TextInput
+              <label>name:</label>
+              <Input
                 type="text"
                 name="item-name"
                 value={name}
@@ -103,8 +104,8 @@ export const AdminPage = () => {
               />
             </div>
             <div className="text-center">
-              <Label>on hand:</Label>
-              <TextInput
+              <label>on hand:</label>
+              <Input
                 type="text"
                 name="item-on-hand"
                 value={number_in_stock}
@@ -112,8 +113,8 @@ export const AdminPage = () => {
               />
             </div>
             <div className="text-center">
-              <Label>cost:</Label>
-              <TextInput
+              <label>cost:</label>
+              <Input
                 type="number"
                 name="item-cost"
                 step="0.01"
@@ -127,7 +128,7 @@ export const AdminPage = () => {
             Insert Item
           </Button>
         </form>
-        <ItemsContainer>
+        <div className="flex flex-col gap-1">
           {items ? <h3>Items: </h3> : null}
           {items &&
             items?.message &&
@@ -140,14 +141,8 @@ export const AdminPage = () => {
                 />
               );
             })}
-        </ItemsContainer>
+        </div>
       </>
     </Layout>
   );
 };
-
-const ItemsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;

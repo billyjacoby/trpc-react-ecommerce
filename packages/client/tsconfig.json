@@ -15,6 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "@styled/typescript-styled-plugin",
@@ -24,7 +25,8 @@
     "paths": {
       "@components/*": ["./src/components/*"],
       "@routes/*": ["./src/routes/*"],
-      "@pages/*": ["./src/pages/*"]
+      "@pages/*": ["./src/pages/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],

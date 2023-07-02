@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Item as ItemType } from '@prisma/client';
-import { Button, Label } from 'flowbite-react';
 import styled from 'styled-components';
+import { Button } from '@components/ui/button';
 
 export const Item = (props: {
   item: ItemType;
@@ -19,29 +19,14 @@ export const Item = (props: {
       <Row>
         {isEditing ? (
           <>
-            <EditButton
-              size="xs"
-              gradientDuoTone="redToYellow"
-              outline
-              onClick={() => setIsEditing(false)}
-            >
-              Cancel
-            </EditButton>
-            <EditButton
-              size="xs"
-              gradientDuoTone="pinkToOrange"
-              outline
-              onClick={() => onDeleteItem(item.id)}
-            >
+            <EditButton onClick={() => setIsEditing(false)}>Cancel</EditButton>
+            <EditButton onClick={() => onDeleteItem(item.id)}>
               Delete
             </EditButton>
           </>
         ) : null}
 
         <EditButton
-          size="xs"
-          gradientDuoTone="greenToBlue"
-          outline
           onClick={
             isEditing
               ? () => {
@@ -56,7 +41,7 @@ export const Item = (props: {
       </Row>
       <h4>{item.name}</h4>
       <Row>
-        <Label>On Hand:</Label>
+        <label>On Hand:</label>
         {isEditing ? (
           <input
             type="number"
@@ -73,7 +58,7 @@ export const Item = (props: {
         )}
       </Row>
       <Row>
-        <Label>Cost:</Label>
+        <label>Cost:</label>
         {isEditing ? (
           <input
             className="rounded-md p-1 w-20 align-middle"
@@ -93,7 +78,7 @@ export const Item = (props: {
         )}
       </Row>
       <Row>
-        <Label>Photos Length:</Label>
+        <label>Photos Length:</label>
         <span>{item.photos.length}</span>
       </Row>
     </Container>
