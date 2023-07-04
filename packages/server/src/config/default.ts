@@ -1,11 +1,16 @@
 import path from 'path';
-require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+require('dotenv').config({path: path.join(__dirname, '../../.env')});
 
-const customConfig: { port: number; origin: string; dbUri: string } = {
+const customConfig: {
+  port: number;
+  origin: string;
+  dbUri: string;
+  jwtToken: string;
+} = {
   port: 8000,
   origin: process.env.ORIGIN as unknown as string,
-
   dbUri: process.env.DATABASE_URL as unknown as string,
+  jwtToken: process.env.JSON_TOKEN as unknown as string,
 };
 
 export default customConfig;

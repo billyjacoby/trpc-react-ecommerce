@@ -10,13 +10,14 @@ datasource db {
 
 model User {
   id       String  @id @default(uuid())
-  name     String  @db.VarChar(255)
   email    String  @unique
+  password String
+  name     String? @db.VarChar(255)
   photo    String?
   verified Boolean @default(false)
+  token    String?
 
-  password String
-  role     RoleEnumType @default(user)
+  role RoleEnumType @default(user)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
