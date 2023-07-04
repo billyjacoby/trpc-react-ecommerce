@@ -25,7 +25,18 @@ const ROUTES = [
 ] as const;
 
 const RIGHT_ITEMS = [
-  {pathname: '/login', displayName: 'Log In', disabled: true},
+  {
+    pathname: '/login',
+    displayName: 'Log In',
+    disabled: false,
+    variant: undefined,
+  },
+  {
+    pathname: '/signup',
+    displayName: 'Sign Up',
+    disabled: false,
+    variant: 'ghost',
+  },
 ] as const;
 
 export const Navigation = () => {
@@ -53,8 +64,9 @@ export const Navigation = () => {
           {/* // TODO: invalid child nesting here, clean up when updating navbar */}
           {RIGHT_ITEMS.map(route => (
             <Button
+              variant={route?.variant}
               key={route.pathname}
-              disabled
+              disabled={route.disabled}
               onClick={() => navigate(route.pathname)}>
               {route.displayName}
             </Button>

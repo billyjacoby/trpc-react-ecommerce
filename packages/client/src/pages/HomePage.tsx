@@ -1,6 +1,4 @@
-import { Layout } from '@components/Layout';
-import '../index.css';
-import { Navigation } from '@components/Navigation';
+import {Layout} from '@components/Layout';
 
 export const HomePage = () => {
   return (

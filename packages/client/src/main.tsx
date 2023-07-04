@@ -7,6 +7,7 @@ import {App} from './App';
 
 import {AdminPage} from '@pages/AdminPage';
 import {HomePage} from '@pages/HomePage';
+import {AuthPage} from '@pages/AuthPage';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,8 @@ const router = createBrowserRouter([
     element: <HomePage />,
   },
   {path: '/admin', element: <AdminPage />},
+  {path: '/login', element: <AuthPage isLogin />},
+  {path: '/signup', element: <AuthPage isLogin={false} />},
 ]);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
