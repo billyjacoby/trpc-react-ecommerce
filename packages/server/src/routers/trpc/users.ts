@@ -1,11 +1,24 @@
 import z from 'zod';
-import {prismaProcedure, t} from '../../lib/trpc/init';
+import {publicProcedure, t} from '../../lib/trpc/init';
 import customConfig from '../../config/default';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import {createResponse} from '../../lib/responseTransformer';
+
+//? Util functions
+const stripPassword = (user: {password?: string}) => {
+  delete user.password;
+  return user;
+};
+
+const genToken = (email: string, id: string) => {
+  return jwt.sign({user_id: id, email: email}, customConfig.jwtToken, {
+    expiresIn: '7d',
+  });
+};
 
 export const usersRouter = t.router({
-  signUp: prismaProcedure
+  signUp: publicProcedure
     .input(
       z.object({
         email: z.string().nonempty().email().min(5),
@@ -25,29 +38,24 @@ export const usersRouter = t.router({
             name,
           },
         });
-        const token = jwt.sign(
-          {user_id: user.id, email: user.email},
-          customConfig.jwtToken,
-          {expiresIn: '7d'},
-        );
+        const token = genToken(user.email, user.id);
 
         await prisma.user.update({
           data: {token},
           where: {id: user.id},
         });
 
-        return {
-          message: {
-            user: {...user, password: undefined},
-            token,
-          },
-        };
+        // return createResponse.success({user: stripPassword(user), token});
+        return {data: {user: stripPassword(user), token}};
       } catch (e) {
         console.error(e);
-        return {error: e};
+        return createResponse.error({
+          error: e,
+          message: 'Unable to create user',
+        });
       }
     }),
-  login: prismaProcedure
+  login: publicProcedure
     .input(
       z.object({
         email: z.string(),
@@ -64,12 +72,19 @@ export const usersRouter = t.router({
         const correctPassword = bcrypt.compareSync(password, user.password);
 
         if (correctPassword) {
-          return {message: user};
+          const token = genToken(user.email, user.id);
+          await prisma.user.update({
+            where: {id: user.id},
+            data: {
+              token,
+            },
+          });
+          return {data: {user: stripPassword(user), token}};
         } else {
-          return {error: {message: 'Incorrect password.'}};
+          return createResponse.error({message: 'Incorrect password.'});
         }
       } else {
-        return {error: {message: 'No user found.'}};
+        return createResponse.error({message: 'No user found.'});
       }
     }),
 });

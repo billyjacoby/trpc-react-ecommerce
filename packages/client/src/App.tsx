@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { getFetch } from '@trpc/client';
-import { loggerLink } from '@trpc/client/links/loggerLink';
-import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
-import { trpc } from './utils/trpc';
+import React from 'react';
+import {QueryClientProvider, QueryClient} from '@tanstack/react-query';
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
+import {createClient, trpc} from './utils/trpc';
+import {useAppStore} from './stores/useAppStore';
 
-export function App({ children }: React.PropsWithChildren) {
-  const [queryClient] = useState(
+export function App({children}: React.PropsWithChildren) {
+  const authToken = useAppStore(state => state.authToken);
+
+  const [queryClient] = React.useState(
     () =>
       new QueryClient({
         defaultOptions: {
@@ -15,26 +15,18 @@ export function App({ children }: React.PropsWithChildren) {
             staleTime: 5 * 1000,
           },
         },
-      })
+      }),
   );
 
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
-      links: [
-        loggerLink(),
-        httpBatchLink({
-          url: 'http://localhost:8000/api/trpc',
-          fetch: async (input, init?) => {
-            const fetch = getFetch();
-            return fetch(input, {
-              ...init,
-              credentials: 'include',
-            });
-          },
-        }),
-      ],
-    })
+  const [trpcClient, setTrpcClient] = React.useState(() =>
+    createClient(authToken),
   );
+
+  React.useEffect(() => {
+    console.log('AUTH TOKEN CHANGE');
+    setTrpcClient(() => createClient(authToken));
+  }, [authToken]);
+
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>

@@ -1,3 +1,4 @@
+import {useAppStore} from '@/stores/useAppStore';
 import {trpc} from '@/utils/trpc';
 import {Layout} from '@components/Layout';
 import {Button} from '@components/ui/button';
@@ -11,7 +12,8 @@ export const AuthPage = ({isLogin}: {isLogin: boolean}) => {
 
   const {mutateAsync: signupMutation} = trpc.users.signUp.useMutation();
   const {mutateAsync: loginMutation} = trpc.users.login.useMutation();
-  //TODO: login...
+
+  const setUser = useAppStore(state => state.setUser);
 
   const onLogin = async ({
     email,
@@ -21,7 +23,10 @@ export const AuthPage = ({isLogin}: {isLogin: boolean}) => {
     password: string;
   }) => {
     const result = await loginMutation({email, password});
-    console.log('🪵 | file: AuthPage.tsx:18 | onLogin | result:', result);
+    if (result.data) {
+      const {user, token} = result.data;
+      setUser(token, user);
+    }
   };
 
   const onSignup = async ({
@@ -32,7 +37,10 @@ export const AuthPage = ({isLogin}: {isLogin: boolean}) => {
     password: string;
   }) => {
     const result = await signupMutation({email, password});
-    console.log('🪵 | file: AuthPage.tsx:21 | onSignup | result:', result);
+    if (result?.data) {
+      const {user, token} = result.data;
+      setUser(token, user);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

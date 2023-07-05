@@ -1,28 +1,16 @@
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
+  NavigationMenuItem,
   navigationMenuTriggerStyle,
+  NavigationMenuLink,
 } from '@/components/ui/navigation-menu';
 
-import {
-  Link,
-  NavLink,
-  useLocation,
-  useNavigate,
-  useNavigation,
-} from 'react-router-dom';
+import {NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {Button} from './ui/button';
 
-const ROUTES = [
-  {pathname: '/', displayName: 'Home'},
-  {pathname: '/admin', displayName: 'Admin'},
-] as const;
+import {ROUTES} from '@/main';
+import {useAppStore} from '@/stores/useAppStore';
 
 const RIGHT_ITEMS = [
   {
@@ -43,6 +31,13 @@ export const Navigation = () => {
   const {pathname} = useLocation();
   const navigate = useNavigate();
 
+  const user = useAppStore(state => state.user);
+  const clearUser = useAppStore(state => state.clearUser);
+
+  const onSignoutClick = () => {
+    clearUser();
+  };
+
   return (
     <div className="w-full border-b border-b-muted mb-2 pb-2 px-6">
       <NavigationMenu
@@ -50,27 +45,41 @@ export const Navigation = () => {
         style={{maxWidth: '100vw'}}>
         <NavigationMenuList>
           {/* // TODO: invalid child nesting here, clean up when updating navbar */}
-          {ROUTES.map(route => (
-            <NavLink to={route.pathname} key={route.pathname}>
-              <NavigationMenuLink
-                className={navigationMenuTriggerStyle()}
-                active={pathname === route.pathname}>
-                {route.displayName}
-              </NavigationMenuLink>
-            </NavLink>
-          ))}
+          {ROUTES.map(route =>
+            route.displayName ? (
+              <NavLink to={route.path} key={route.path}>
+                <NavigationMenuItem
+                  className={
+                    pathname === route.path
+                      ? navigationMenuTriggerStyle() + ' bg-accent/50'
+                      : navigationMenuTriggerStyle()
+                  }>
+                  {route.displayName}
+                </NavigationMenuItem>
+              </NavLink>
+            ) : null,
+          )}
         </NavigationMenuList>
         <NavigationMenuList>
+          {!!user ? (
+            <>
+              <Button disabled variant="ghost">
+                {user.email}
+              </Button>
+              <Button onClick={onSignoutClick}>Sign Out</Button>
+            </>
+          ) : (
+            RIGHT_ITEMS.map(route => (
+              <Button
+                variant={route?.variant}
+                key={route.pathname}
+                disabled={route.disabled}
+                onClick={() => navigate(route.pathname)}>
+                {route.displayName}
+              </Button>
+            ))
+          )}
           {/* // TODO: invalid child nesting here, clean up when updating navbar */}
-          {RIGHT_ITEMS.map(route => (
-            <Button
-              variant={route?.variant}
-              key={route.pathname}
-              disabled={route.disabled}
-              onClick={() => navigate(route.pathname)}>
-              {route.displayName}
-            </Button>
-          ))}
         </NavigationMenuList>
       </NavigationMenu>
     </div>

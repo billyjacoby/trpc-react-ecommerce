@@ -1,14 +1,15 @@
 import React from 'react';
-import type { Item as ItemType } from '@prisma/client';
+import type {Item as ItemType} from '@prisma/client';
 import styled from 'styled-components';
-import { Button } from '@components/ui/button';
+import {Button} from '@components/ui/button';
 
 export const Item = (props: {
   item: ItemType;
   onDeleteItem: (id: string) => void;
   onUpdateItem: (args: Partial<ItemType>) => void;
+  isAuthed: boolean;
 }) => {
-  const { item, onDeleteItem, onUpdateItem } = props;
+  const {item, onDeleteItem, onUpdateItem, isAuthed} = props;
 
   const [isEditing, setIsEditing] = React.useState(false);
   const [onHand, setOnHand] = React.useState<number>(item.number_in_stock ?? 0);
@@ -16,29 +17,33 @@ export const Item = (props: {
 
   return (
     <Container>
-      <Row>
-        {isEditing ? (
-          <>
-            <EditButton onClick={() => setIsEditing(false)}>Cancel</EditButton>
-            <EditButton onClick={() => onDeleteItem(item.id)}>
-              Delete
-            </EditButton>
-          </>
-        ) : null}
+      {isAuthed && (
+        <Row>
+          {isEditing ? (
+            <>
+              <EditButton onClick={() => setIsEditing(false)}>
+                Cancel
+              </EditButton>
+              <EditButton onClick={() => onDeleteItem(item.id)}>
+                Delete
+              </EditButton>
+            </>
+          ) : null}
 
-        <EditButton
-          onClick={
-            isEditing
-              ? () => {
-                  onUpdateItem({ id: item.id, cost, number_in_stock: onHand });
-                  setIsEditing(false);
-                }
-              : () => setIsEditing(true)
-          }
-        >
-          {isEditing ? 'Submit' : 'Edit'}
-        </EditButton>
-      </Row>
+          <EditButton
+            onClick={
+              isEditing
+                ? () => {
+                    onUpdateItem({id: item.id, cost, number_in_stock: onHand});
+                    setIsEditing(false);
+                  }
+                : () => setIsEditing(true)
+            }>
+            {isEditing ? 'Submit' : 'Edit'}
+          </EditButton>
+        </Row>
+      )}
+
       <h4>{item.name}</h4>
       <Row>
         <label>On Hand:</label>
@@ -47,9 +52,9 @@ export const Item = (props: {
             type="number"
             className="rounded-md p-1 w-20 align-middle"
             value={onHand}
-            onChange={(e) =>
+            onChange={e =>
               setOnHand(
-                isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+                isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value),
               )
             }
           />
@@ -65,11 +70,11 @@ export const Item = (props: {
             type="number"
             step={0.01}
             value={cost}
-            onChange={(e) =>
+            onChange={e =>
               setCost(
                 isNaN(parseFloat(e.target.value))
                   ? 0
-                  : parseFloat(e.target.value)
+                  : parseFloat(e.target.value),
               )
             }
           />

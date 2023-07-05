@@ -1,24 +1,25 @@
 import z from 'zod';
-import { prismaProcedure, t } from '../../lib/trpc/init';
+import {publicProcedure, protectedProcedure, t} from '../../lib/trpc/init';
 
 export const itemsRouter = t.router({
-  countItems: prismaProcedure.query(async ({ ctx: { prisma } }) => {
+  countItems: publicProcedure.query(async ({ctx: {prisma}}) => {
     const itemsCount = await prisma.item.count();
-    return { message: `number of items: ${itemsCount}` };
+    return {message: `number of items: ${itemsCount}`};
   }),
-  listItems: prismaProcedure.query(async ({ ctx: { prisma } }) => {
+  listItems: publicProcedure.query(async ({ctx: {prisma}}) => {
     const items = await prisma.item.findMany();
-    return { message: items };
+    return {data: {items}};
   }),
-  addItem: prismaProcedure
+  addItem: protectedProcedure
     .input(
       z.object({
         name: z.string().nonempty(),
         cost: z.number().optional(),
         onHand: z.number().optional(),
-      })
+      }),
     )
-    .mutation(async ({ input, ctx: { prisma } }) => {
+    .mutation(async ({input, ctx: {prisma, user}}) => {
+      console.log('🪵 | file: items.ts:22 | .mutation | user:', user);
       const result = await prisma.item.create({
         data: {
           name: input.name,
@@ -26,36 +27,35 @@ export const itemsRouter = t.router({
           number_in_stock: input.onHand,
         },
       });
-      return { message: result };
+      return {data: result};
     }),
-  removeItem: prismaProcedure
+  removeItem: protectedProcedure
     .input(
       z.object({
         id: z.string().nonempty(),
-      })
+      }),
     )
-    .mutation(async ({ input, ctx: { prisma } }) => {
-      const result = await prisma.item.delete({ where: { id: input.id } });
+    .mutation(async ({input, ctx: {prisma}}) => {
+      const result = await prisma.item.delete({where: {id: input.id}});
 
-      return { message: result };
+      return {data: result};
     }),
-  updateItem: prismaProcedure
+  updateItem: protectedProcedure
     .input(
       z.object({
         id: z.string().nonempty(),
         cost: z.number().optional(),
         number_in_stock: z.number().optional(),
-      })
+      }),
     )
-    .mutation(async ({ input, ctx: { prisma } }) => {
+    .mutation(async ({input, ctx: {prisma}}) => {
       const result = await prisma.item.update({
         where: {
           id: input.id,
         },
-        data: { cost: input.cost, number_in_stock: input.number_in_stock },
+        data: {cost: input.cost, number_in_stock: input.number_in_stock},
       });
-      console.log('result', result);
 
-      return { message: result };
+      return {data: result};
     }),
 });
